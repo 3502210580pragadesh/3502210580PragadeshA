@@ -1,0 +1,61 @@
+import React, { useState } from 'react';
+
+function App() {
+  const [symbol, setSymbol] = useState('');
+  const [data, setData] = useState(null);
+  const [error, setError] = useState('');
+
+  const fetchStock = async () => {
+    setError('');
+    setData(null);
+    try {
+      const res = await fetch(http://localhost:3000/stocks?symbol=${symbol});
+      if (!res.ok) throw new Error('Failed to fetch');
+      const result = await res.json();
+      setData(result);
+    } catch (err) {
+      setError('Could not retrieve stock data');
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100 p-4">
+      <div className="max-w-md mx-auto bg-white p-6 rounded shadow">
+        <h1 className="text-2xl font-bold mb-4">Stock Price Aggregator</h1>
+        <input
+          type="text"
+          placeholder="Enter stock symbol (e.g., AAPL)"
+          value={symbol}
+          onChange={(e) => setSymbol(e.target.value)}
+          className="border px-3 py-2 w-full mb-4"
+        />
+        <button
+          onClick={fetchStock}
+          className="bg-blue-600 text-white px-4 py-2 rounded w-full"
+        >
+          Get Price
+        </button>
+
+        {error && <p className="text-red-500 mt-4">{error}</p>}
+
+        {data && (
+          <div className="mt-6">
+            <h2 className="text-lg font-semibold">Results for {data.symbol}:</h2>
+            <ul className="list-disc pl-5">
+              {data.prices.map((price, idx) => (
+                <li key={idx}>
+                  {price.source}: ${price.value.toFixed(2)}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-2 font-medium">
+              Average: ${data.average.toFixed(2)}
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default App;
